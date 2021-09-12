@@ -125,3 +125,6 @@ typings/
 !.vscode/extensions.json
 .history/*
 .eslintrc.js
+
+data
+dist

@@ -8,6 +8,7 @@ import TicketsMiddleware from "./middleware/tickets.middleware";
 import jwtMiddleware from '../auth/middleware/jwt.middleware';
 import permissionMiddleware from '../common/middleware/common.permission.middleware';
 import { UserRole } from "../common/middleware/common.permissionflag.enum";
+import commentsController from "../comments/controllers/comments.controller";
 
 export class TicketsRoutes extends CommonRoutesConfig {
 
@@ -37,7 +38,7 @@ export class TicketsRoutes extends CommonRoutesConfig {
             .route(`/tickets/download/csv`)
             .get(
                 jwtMiddleware.validJWTNeeded,
-                permissionMiddleware.permissionFlagRequired(UserRole.ADMIN),
+                permissionMiddleware.permissionFlagRequired(UserRole.STAFF), // todo test staff
                 TicketsController.listAllClosedTicketInOneMonth
             )
 
@@ -49,15 +50,31 @@ export class TicketsRoutes extends CommonRoutesConfig {
                 jwtMiddleware.validJWTNeeded,
             )
             .get(
-                TicketsMiddleware.validateTicketBelongToUserOrStaffAndAdmin,
+                TicketsMiddleware.validateTicketBelongToUserOrIsStaffOrAdmin,
                 TicketsController.getTicketById)
 
             this.app.put(`/tickets/:ticketId/close`, [
                 jwtMiddleware.validJWTNeeded,
                 TicketsMiddleware.validateTicketExists,
-                TicketsMiddleware.validateTicketBelongToUserOrStaffAndAdmin,
+                TicketsMiddleware.validateTicketBelongToUserOrIsStaffOrAdmin,
                 TicketsController.closeTicket,
             ]);
+
+            // COMMENTS
+            this.app
+            .route(`/tickets/:ticketId/comments`)
+            .all(
+                jwtMiddleware.validJWTNeeded,
+                TicketsMiddleware.extractTicketId,
+                TicketsMiddleware.validateTicketExists,
+                TicketsMiddleware.validateTicketBelongToUserOrIsStaffOrAdmin
+            )
+            .get(commentsController.listAllTicketsComments)
+            .post(
+                body('comment').isString(),
+                BodyValidationMiddleware.verifyBodyFieldsErrors,
+                commentsController.create
+            )
       
 
         return this.app;

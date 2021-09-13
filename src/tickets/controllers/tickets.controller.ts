@@ -1,4 +1,4 @@
-import ticketsService from '../services/tickets.service';
+import ticketsService from '../services/tickets.serviceImpl';
 import express from 'express';
 import { debug } from 'debug';
 import { CreateTicketDto } from '../dtos/create.ticket.dto';
@@ -66,7 +66,7 @@ class TicketssController {
     async createTicket(req: express.Request, res: express.Response) {
         let createTicketDto: CreateTicketDto = req.body;
         createTicketDto.createdByUser = res.locals.jwt.userId;
-        const ticketId = await ticketsService.create(req.body);
+        const ticketId = await ticketsService.create(createTicketDto);
         res.status(201).send({ id: ticketId });
     }
 

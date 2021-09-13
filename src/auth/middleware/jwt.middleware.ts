@@ -2,7 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { Jwt } from '../../common/types/jwt';
-import usersService from '../../users/services/users.service';
+import usersService from '../../users/services/users.serviceImpl';
 import { debug } from 'debug';
 
 const log: debug.IDebugger = debug('app:jwt-middleware');
@@ -61,10 +61,10 @@ class JwtMiddleware {
                     next();
                 }
             } catch (err) {
-                return res.status(403).send();
+                return res.status(403).send({message: "Failed", errors: ["Unauthorized request: invalid token"]});
             }
         } else {
-            return res.status(401).send();
+            return res.status(401).send({message: "Failed", errors: ["Bad request"]});
         }
     }
 }

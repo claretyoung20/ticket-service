@@ -57,6 +57,7 @@ export class UsersRoutes extends CommonRoutesConfig {
 
         this.app.put(`/users/:userId/role/:role`, [
             jwtMiddleware.validJWTNeeded,
+            UsersMiddleware.validateUserExists,
             permissionMiddleware.permissionFlagRequired(UserRole.ADMIN),
             UsersController.updatePermissionFlags,
         ]);

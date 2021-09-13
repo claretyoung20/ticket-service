@@ -1,8 +1,8 @@
 import { debug } from 'debug';
 import express from 'express';
-import { Types } from 'mongoose';
+import { isValidObjectId, Types } from 'mongoose';
 import { UserRole } from '../../common/middleware/common.permissionflag.enum';
-import ticketService from '../services/tickets.service';
+import ticketService from '../services/tickets.serviceImpl';
 
 const log: debug.IDebugger = debug('app:tickets-middleware');
 
@@ -22,17 +22,24 @@ class TicketsMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const ticket = await ticketService.readById(req.params.ticketId);
-        if (ticket) {
-            res.locals.ticket = ticket;
-            next();
+        if(isValidObjectId(req.params.ticketId)) {
+            const ticket = await ticketService.readById(req.params.ticketId);
+            if (ticket) {
+                res.locals.ticket = ticket;
+                next();
+            } else {
+                res.status(404).send({
+                    errors: [`Ticket ${req.params.ticketId} not found`],
+                });
+            }
         } else {
-            res.status(404).send({
-                errors: [`Ticket ${req.params.ticketId} not found`],
+            res.status(400).send({
+                errors: ['Invalid request'],
             });
         }
+       
     }
-    async validateTicketBelongToUserOrStaffAndAdmin(
+    async validateTicketBelongToUserOrIsStaffOrAdmin(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction

@@ -70,7 +70,6 @@ class TicketsDao {
             ...ticketFields
         });
         await ticket.save();
-        log("ticket: %0", ticket);
         return ticket._id;
     }
 

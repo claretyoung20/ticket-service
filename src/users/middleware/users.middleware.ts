@@ -1,5 +1,6 @@
 import express from 'express';
-import userService from '../services/users.service';
+import { isValidObjectId } from 'mongoose';
+import userService from '../services/users.serviceImpl';
 
 class UsersMiddleware {
     async validateSameEmailDoesntExist(
@@ -62,15 +63,22 @@ class UsersMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const user = await userService.readById(req.params.userId);
-        if (user) {
-            res.locals.user = user;
-            next();
+        if(isValidObjectId(req.params.userId)) {
+            const user = await userService.readById(req.params.userId);
+            if (user) {
+                res.locals.user = user;
+                next();
+            } else {
+                res.status(404).send({
+                    errors: [`User ${req.params.userId} not found`],
+                });
+            }
         } else {
-            res.status(404).send({
-                errors: [`User ${req.params.userId} not found`],
+            res.status(400).send({message: 'Failed',
+                errors: ['Invalid request'],
             });
         }
+        
     }
 
     async extractUserId(

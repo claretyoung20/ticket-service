@@ -10,6 +10,7 @@ import { CommonRoutesConfig } from './src/common/common.routes.config';
 import { AuthRoutes } from './src/auth/auth.routes.config';
 import helmet from 'helmet';
 import { TicketsRoutes } from './src/tickets/tickets.routes.config';
+import { CommentsRoutes } from './src/comments/comments.routes.config';
 
 const app: express.Application = express();
 
@@ -59,6 +60,8 @@ routes.push(new AuthRoutes(app));
 routes.push(new UsersRoutes(app));
 
 routes.push(new TicketsRoutes(app)); 
+
+routes.push(new CommentsRoutes(app));
 
 // this is a simple route to make sure everything is working properly
 const runningMessage = `Server running at ${url}`;

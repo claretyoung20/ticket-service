@@ -9,6 +9,7 @@ import debug from 'debug';
 import { CommonRoutesConfig } from './src/common/common.routes.config';
 import { AuthRoutes } from './src/auth/auth.routes.config';
 import helmet from 'helmet';
+import { TicketsRoutes } from './src/tickets/tickets.routes.config';
 
 const app: express.Application = express();
 
@@ -56,6 +57,8 @@ routes.push(new AuthRoutes(app));
 // here we are adding the UserRoutes to our array,
 // after sending the Express.js application object to have the routes added to our app!
 routes.push(new UsersRoutes(app));
+
+routes.push(new TicketsRoutes(app)); 
 
 // this is a simple route to make sure everything is working properly
 const runningMessage = `Server running at ${url}`;

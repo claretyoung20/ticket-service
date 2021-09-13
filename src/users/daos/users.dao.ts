@@ -36,7 +36,7 @@ class UsersDao {
 
     }, { timestamps: true });
 
-    User = mongooseService.getMongoose().model('Users', this.userSchema);
+    User = mongooseService.getMongoose().model('User', this.userSchema);
 
     constructor() {
         log('Created new instance of UsersDao');

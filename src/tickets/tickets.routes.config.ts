@@ -60,6 +60,13 @@ export class TicketsRoutes extends CommonRoutesConfig {
                 TicketsController.closeTicket,
             ]);
 
+            this.app.put(`/tickets/:ticketId/reopen`, [
+                jwtMiddleware.validJWTNeeded,
+                TicketsMiddleware.validateTicketExists,
+                permissionMiddleware.permissionFlagRequired(UserRole.USER),
+                TicketsController.reOpenTicket
+            ]);
+
             // COMMENTS
             this.app
             .route(`/tickets/:ticketId/comments`)
@@ -69,7 +76,7 @@ export class TicketsRoutes extends CommonRoutesConfig {
                 TicketsMiddleware.validateTicketExists,
                 TicketsMiddleware.validateTicketBelongToUserOrIsStaffOrAdmin
             )
-            .get(commentsController.listAllTicketsComments)
+            .get(TicketsController.listAllComments)
             .post(
                 body('comment').isString(),
                 BodyValidationMiddleware.verifyBodyFieldsErrors,

@@ -1,6 +1,7 @@
 import mongooseService from '../../common/services/mongoose.service';
 import debug from 'debug';
 import { CreateCommentDto } from '../dtos/create.comment.dto';
+import { Schema } from 'mongoose';
 const log: debug.IDebugger = debug('app:comments-dao');
 
 class CommentsDao {
@@ -13,13 +14,13 @@ class CommentsDao {
             required: true
         },
         ticket: {
-            type: this.Schema.Types.ObjectId,
-            ref: "Tickets",
+            type: Schema.Types.ObjectId,
+            ref: "Ticket",
             required: true
         },
         commentBy: {
-            type: this.Schema.Types.ObjectId,
-            ref: "Users",
+            type: Schema.Types.ObjectId,
+            ref: "User",
             required: true
         },
         attachmentUrl: {
@@ -28,7 +29,7 @@ class CommentsDao {
         
     }, { timestamps: true });
 
-    Comment = mongooseService.getMongoose().model('Comments', this.commentSchema);
+    Comment = mongooseService.getMongoose().model('Comment', this.commentSchema);
 
     constructor() {
         log('Created new instance of CommentsDao');
@@ -61,6 +62,7 @@ class CommentsDao {
         const existingComment = await this.Comment.find(
             { ticket: ticketId }
         )
+        .populate(['commentBy', 'ticket'])
         .sort({ createdAt: 'desc'}) 
         .exec();
         return existingComment;

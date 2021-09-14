@@ -45,5 +45,9 @@ class TicketServiceImpl implements TicketService {
     async putById(id: string, resource: UpdateTicketDto) {
         return null; // TODO
     }
+
+    async reOpenTicket(id: string) {
+        return TicketsDao.reOpenTicketById(id);
+    }
 }
 export default new TicketServiceImpl();

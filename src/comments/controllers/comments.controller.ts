@@ -2,8 +2,10 @@ import commentsService from '../services/comments.serviceImpl';
 import express from 'express';
 import { debug } from 'debug';
 import { CreateCommentDto } from '../dtos/create.comment.dto';
-import usersService from '../../users/services/users.serviceImpl';
 import { UserRole } from '../../common/middleware/common.permissionflag.enum';
+import { TicketStatus } from '../../tickets/daos/ticket.status.enum copy';
+import { UserJwt } from '../../common/types/jwt';
+import ticketsService from '../../tickets/services/tickets.serviceImpl';
 
 const log: debug.IDebugger = debug('app:comments-controller');
 
@@ -15,17 +17,26 @@ class CommentsController {
     }
 
     async create(req: express.Request, res: express.Response) {
+
         let createCommentDto: CreateCommentDto = req.body;
+
         createCommentDto.commentBy = res.locals.jwt.userId;
-        createCommentDto.ticket = res.locals.ticket._id;
+        
+        let ticket = res.locals.ticket;
+        createCommentDto.ticket = ticket._id;
+
+        let userJWT: UserJwt = res.locals.jwt;
+
+        if(ticket.status === TicketStatus.CLOSE){
+            await ticketsService.reOpenTicket(ticket._id);
+        }
 
         const comments = await commentsService.listAllTicketsComments(createCommentDto.ticket);
         if (comments && comments.length >= 1) {
             const commentId = await commentsService.create(createCommentDto);
             res.status(201).send({ id: commentId });
         } else {
-            const user: any = await usersService.readById(res.locals.jwt.userId);
-            if (user && user.role !== UserRole.USER) {
+            if (parseInt(userJWT.role) !== UserRole.USER) {
                 const commentId = await commentsService.create(createCommentDto);
                 res.status(201).send({ id: commentId });
             } else {

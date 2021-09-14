@@ -4,6 +4,7 @@ import { debug } from 'debug';
 import { CreateTicketDto } from '../dtos/create.ticket.dto';
 import { UpdateTicketDto } from '../dtos/update.ticket.dto';
 import DownloaderService from '../../common/services/downloader.service';
+import commentsService from '../../comments/services/comments.serviceImpl';
 
 const log: debug.IDebugger = debug('app:tickets-controller');
 
@@ -75,6 +76,16 @@ class TicketssController {
         updateTicketDto.closeByUser = res.locals.jwt.userId;
         const existingTicket = await ticketsService.patchById(req.body.id, updateTicketDto);
         res.status(201).send({ ticket: existingTicket, message: 'Successful' });
+    }
+
+    async reOpenTicket(req: express.Request, res: express.Response) {
+        const ticketId = await ticketsService.reOpenTicket(req.body.id);
+        res.status(201).send({ ticketId: ticketId, message: 'Successful' });
+    }
+
+    async listAllComments(req: express.Request, res: express.Response) {
+        const ticket = await commentsService.listAllTicketsComments(req.body.id);
+        res.status(200).send(ticket);
     }
 
 }

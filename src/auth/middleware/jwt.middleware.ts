@@ -1,7 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { Jwt } from '../../common/types/jwt';
+import { UserJwt } from '../../common/types/jwt';
 import usersService from '../../users/services/users.serviceImpl';
 import { debug } from 'debug';
 
@@ -57,7 +57,7 @@ class JwtMiddleware {
                     res.locals.jwt = jwt.verify(
                         authorization[1],
                         jwtSecret
-                    ) as Jwt;
+                    ) as UserJwt;
                     next();
                 }
             } catch (err) {

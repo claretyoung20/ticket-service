@@ -6,13 +6,14 @@ import { TicketPiority } from './ticket.pirority.enum';
 import { TicketDepartment } from './ticket.department.enum';
 import { SearchTicketDto } from '../dtos/searchDto.dto';
 import { UpdateTicketDto } from '../dtos/update.ticket.dto';
+import { Schema } from 'mongoose';
 const log: debug.IDebugger = debug('app:tickets-dao');
 
 class TicketsDao {
     Schema = mongooseService.getMongoose().Schema;
 
     ticketSchema = new this.Schema({
-        
+
         service: String,
         department: {
             type: String,
@@ -20,9 +21,9 @@ class TicketsDao {
             default: TicketDepartment.CUSTOMER_SERVICE
         },
 
-        priority: { 
-            type: String, 
-            enum : TicketPiority, 
+        priority: {
+            type: String,
+            enum: TicketPiority,
             default: TicketPiority.MEDIUM
         },
         status: {
@@ -32,12 +33,12 @@ class TicketsDao {
         },
 
         closeByUser: {
-            type: this.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User"
         },
 
         createdByUser: {
-            type: this.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User",
             required: true
         },
@@ -49,17 +50,18 @@ class TicketsDao {
 
         ticketMessage: {
             type: String,
-            required: true 
+            required: true
         },
 
         attachmentUrl: {
             type: [String]
         },
 
-        dateClose: Date
+        dateClose: Date,
+
     }, { timestamps: true });
 
-    Ticket = mongooseService.getMongoose().model('Tickets', this.ticketSchema);
+    Ticket = mongooseService.getMongoose().model('Ticket', this.ticketSchema);
 
     constructor() {
         log('Created new instance of TicketsDao');
@@ -82,15 +84,15 @@ class TicketsDao {
 
     async getAllClosedTicketInOneMonth(searchDto: SearchTicketDto) {
         return this.Ticket.find(
-           {
+            {
                 dateClose: {
                     $gte: searchDto.startDate,
                     $lt: searchDto.endDate
                 },
                 status: TicketStatus.CLOSE
-           }
-        ).sort({ dateClose: 'asc'}) 
-        .exec();
+            }
+        ).sort({ dateClose: 'asc' })
+            .exec();
     }
 
     async getTicketById(ticketId: string) {
@@ -107,16 +109,38 @@ class TicketsDao {
     ) {
         const existingTicket = await this.Ticket.findOneAndUpdate(
             { _id: ticketId },
-            { $set: {
-                status: TicketStatus.CLOSE,
-                closeByUser: ticketFields.closeByUser,
-                dateClose: new Date()
-            } },
+            {
+                $set: {
+                    status: TicketStatus.CLOSE,
+                    closeByUser: ticketFields.closeByUser,
+                    dateClose: new Date(),
+                    getTimeupdatedAt: new Date()
+                }
+            },
             { new: true }
         ).exec();
 
         return existingTicket;
     }
+
+    async reOpenTicketById(
+        ticketId: string,
+    ) {
+        const existingTicket = await this.Ticket.findOneAndUpdate(
+            { _id: ticketId },
+            {
+                $set: {
+                    status: TicketStatus.ACTIVE,
+                    updatedAt: new Date()
+                }
+            },
+            { new: true }
+        ).exec();
+
+        return existingTicket;
+    }
+
+
 }
 
 export default new TicketsDao();

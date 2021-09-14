@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsc && node --unhandled-rejections=strict ./dist/app.js",
     "debug": "export DEBUG=* && npm run start",
-    "test": "mocha -r ts-node/register 'test/**/*.test.ts' --unhandled-rejections=strict",
+    "test": "mocha -r ts-node/register 'src/test/**/*.test.ts' --unhandled-rejections=strict",
     "test-debug": "export DEBUG=* && npm test"
   },
   "author": "Young Maryclaret Nnenna",
@@ -23,6 +23,7 @@
     "json2csv": "^5.0.6",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.5",
+    "shortid": "^2.2.16",
     "validator": "^13.5.2",
     "winston": "^3.3.3"
   },

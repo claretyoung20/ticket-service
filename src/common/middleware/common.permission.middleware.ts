@@ -17,7 +17,7 @@ class CommonPermissionMiddleware {
                 if (userPermissionFlags & requiredPermissionFlag) {
                     next();
                 } else {
-                    res.status(403).send({ message: 'Failed', error: "Unauthorized request" });
+                    res.status(403).send({ message: 'Failed', errors: ["Unauthorized request"] });
                 }
             } catch (e) {
                 log(e);

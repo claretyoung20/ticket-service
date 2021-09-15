@@ -38,7 +38,7 @@ export class TicketsRoutes extends CommonRoutesConfig {
             .route(`/tickets/download/csv`)
             .get(
                 jwtMiddleware.validJWTNeeded,
-                permissionMiddleware.permissionFlagRequired([UserRole.STAFF]), // todo test staff
+                permissionMiddleware.permissionFlagRequired([UserRole.STAFF, UserRole.ADMIN]),
                 TicketsController.listAllClosedTicketInOneMonth
             )
 

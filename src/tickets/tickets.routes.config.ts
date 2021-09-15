@@ -21,7 +21,7 @@ export class TicketsRoutes extends CommonRoutesConfig {
             .route(`/tickets`)
             .get(
                 jwtMiddleware.validJWTNeeded,
-                permissionMiddleware.permissionFlagRequired(UserRole.ADMIN),
+                permissionMiddleware.permissionFlagRequired([UserRole.STAFF,  UserRole.ADMIN]),
                 TicketsController.listTickets
             )
             .post(
@@ -38,7 +38,7 @@ export class TicketsRoutes extends CommonRoutesConfig {
             .route(`/tickets/download/csv`)
             .get(
                 jwtMiddleware.validJWTNeeded,
-                permissionMiddleware.permissionFlagRequired(UserRole.STAFF), // todo test staff
+                permissionMiddleware.permissionFlagRequired([UserRole.STAFF]), // todo test staff
                 TicketsController.listAllClosedTicketInOneMonth
             )
 
@@ -63,7 +63,7 @@ export class TicketsRoutes extends CommonRoutesConfig {
             this.app.put(`/tickets/:ticketId/reopen`, [
                 jwtMiddleware.validJWTNeeded,
                 TicketsMiddleware.validateTicketExists,
-                permissionMiddleware.permissionFlagRequired(UserRole.USER),
+                permissionMiddleware.permissionFlagRequired([UserRole.USER]),
                 TicketsController.reOpenTicket
             ]);
 

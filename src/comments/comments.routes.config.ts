@@ -21,7 +21,7 @@ export class CommentsRoutes extends CommonRoutesConfig {
             .route(`/comments`)
             .get(
                 jwtMiddleware.validJWTNeeded,
-                permissionMiddleware.permissionFlagRequired(UserRole.ADMIN),
+                permissionMiddleware.permissionFlagRequired([UserRole.ADMIN]),
                 CommentsController.listComments
             )
 

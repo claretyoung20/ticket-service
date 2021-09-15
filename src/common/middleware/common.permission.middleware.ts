@@ -5,7 +5,7 @@ import debug from 'debug';
 const log: debug.IDebugger = debug('app:common-permission-middleware');
 
 class CommonPermissionMiddleware {
-    permissionFlagRequired(requiredPermissionFlag: UserRole) {
+    permissionFlagRequired(requiredPermissionFlag: Array<UserRole>) {
         return (
             req: express.Request,
             res: express.Response,
@@ -14,11 +14,26 @@ class CommonPermissionMiddleware {
             try {
                 const userPermissionFlags = parseInt(res.locals.jwt.role);
                 
-                if (userPermissionFlags & requiredPermissionFlag) {
+                let isPermitted = false;
+                for (let index = 0; index < requiredPermissionFlag.length; index++) {
+                    
+                    const element = requiredPermissionFlag[index];
+
+                    if (userPermissionFlags & element) {
+                        isPermitted = true;
+                        break;
+                    } else {
+                        isPermitted = false; 
+                    }
+                }
+
+                if(isPermitted) {
                     next();
                 } else {
                     res.status(403).send({ message: 'Failed', errors: ["Unauthorized request"] });
                 }
+               
+                
             } catch (e) {
                 log(e);
             }
